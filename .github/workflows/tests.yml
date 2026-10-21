@@ -1,0 +1,71 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            laravel: '11.*'
+            testbench: '9.*'
+          - php: '8.2'
+            laravel: '12.*'
+            testbench: '10.*'
+          - php: '8.4'
+            laravel: '12.*'
+            testbench: '10.*'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Validate Composer metadata
+        run: composer validate --strict
+
+      - name: Resolve matrix dependencies
+        run: composer update --no-interaction --prefer-dist --with-all-dependencies "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}"
+
+      - name: Generate optimized autoload files
+        run: composer dump-autoload --optimize
+
+      - name: Run package tests
+        run: vendor/bin/phpunit
+
+  clean-install:
+    name: Clean Laravel 11 install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Create a fresh Laravel application
+        run: composer create-project laravel/laravel:^11.0 /tmp/schedule-audit-app --no-interaction --prefer-dist
+
+      - name: Install the package with normal Composer scripts
+        working-directory: /tmp/schedule-audit-app
+        run: |
+          composer config repositories.schedule-audit '{"type":"path","url":"${{ github.workspace }}","options":{"symlink":false}}'
+          composer require --dev asfiaaiman/laravel-schedule-audit:@dev --no-interaction --prefer-dist
+
+      - name: Verify package discovery and command invocation
+        working-directory: /tmp/schedule-audit-app
+        run: |
+          php artisan package:discover --ansi
+          php artisan list --raw | grep '^schedule:audit$'
+          output="$(php artisan schedule:audit --no-ansi)"
+          test "$output" = 'No audit findings.'
