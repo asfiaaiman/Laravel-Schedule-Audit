@@ -76,9 +76,7 @@ jobs:
       - name: Diagnose provider and command autoloading
         working-directory: /tmp/schedule-audit-app
         run: |
-          php -r "require 'vendor/autoload.php'; var_dump(class_exists('AsfiaAiman\\LaravelScheduleAudit\\LaravelScheduleAuditServiceProvider'));"
-          php -r "require 'vendor/autoload.php'; var_dump(class_exists('AsfiaAiman\\LaravelScheduleAudit\\Commands\\ScheduleAuditCommand'));"
-          grep -n 'LaravelScheduleAuditServiceProvider' bootstrap/cache/packages.php || true
+          php -r 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); var_dump($app->providerIsLoaded(AsfiaAiman\LaravelScheduleAudit\LaravelScheduleAuditServiceProvider::class)); var_dump(array_key_exists("schedule:audit", Illuminate\Support\Facades\Artisan::all()));'
 
       - name: Verify command registration
         working-directory: /tmp/schedule-audit-app
