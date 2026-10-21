@@ -52,6 +52,7 @@ jobs:
   clean-install:
     name: Clean Laravel 12 install
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -80,7 +81,7 @@ jobs:
 
       - name: Verify command registration
         working-directory: /tmp/schedule-audit-app
-        run: php artisan list --raw | grep '^schedule:audit$'
+        run: php artisan schedule:audit --help --no-ansi
 
       - name: Verify clean audit output
         working-directory: /tmp/schedule-audit-app
