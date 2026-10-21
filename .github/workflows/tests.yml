@@ -12,18 +12,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '8.2'
-            laravel: '12.*'
-            testbench: '10.*'
-          - php: '8.4'
-            laravel: '12.*'
-            testbench: '10.*'
-          - php: '8.3'
-            laravel: '13.*'
-            testbench: '11.*'
-          - php: '8.4'
-            laravel: '13.*'
-            testbench: '11.*'
+          - php: "8.2"
+            laravel: "12.*"
+            testbench: "10.*"
+          - php: "8.4"
+            laravel: "12.*"
+            testbench: "10.*"
+          - php: "8.3"
+            laravel: "13.*"
+            testbench: "11.*"
+          - php: "8.4"
+            laravel: "13.*"
+            testbench: "11.*"
 
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +56,7 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: "8.2"
           coverage: none
 
       - name: Create a fresh Laravel application
@@ -68,10 +68,17 @@ jobs:
           composer config repositories.schedule-audit '{"type":"path","url":"${{ github.workspace }}","options":{"symlink":false}}'
           composer require --dev asfiaaiman/laravel-schedule-audit:@dev --no-interaction --prefer-dist
 
-      - name: Verify package discovery and command invocation
+      - name: Verify package discovery
+        working-directory: /tmp/schedule-audit-app
+        run: php artisan package:discover --ansi
+
+      - name: Verify command registration
+        working-directory: /tmp/schedule-audit-app
+        run: php artisan list --raw | grep '^schedule:audit$'
+
+      - name: Verify clean audit output
         working-directory: /tmp/schedule-audit-app
         run: |
-          php artisan package:discover --ansi
-          php artisan list --raw | grep '^schedule:audit$'
           output="$(php artisan schedule:audit --no-ansi)"
+          printf 'Actual output: <%s>\n' "$output"
           test "$output" = 'No audit findings.'
