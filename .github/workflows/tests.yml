@@ -1,3 +1,4 @@
+
 name: Tests
 
 on:
@@ -71,6 +72,13 @@ jobs:
       - name: Verify package discovery
         working-directory: /tmp/schedule-audit-app
         run: php artisan package:discover --ansi
+
+      - name: Diagnose provider and command autoloading
+        working-directory: /tmp/schedule-audit-app
+        run: |
+          php -r "require 'vendor/autoload.php'; var_dump(class_exists('AsfiaAiman\\LaravelScheduleAudit\\LaravelScheduleAuditServiceProvider'));"
+          php -r "require 'vendor/autoload.php'; var_dump(class_exists('AsfiaAiman\\LaravelScheduleAudit\\Commands\\ScheduleAuditCommand'));"
+          grep -n 'LaravelScheduleAuditServiceProvider' bootstrap/cache/packages.php || true
 
       - name: Verify command registration
         working-directory: /tmp/schedule-audit-app
