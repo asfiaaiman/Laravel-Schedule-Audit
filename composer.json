@@ -1,0 +1,31 @@
+{
+    "name": "asfiaaiman/laravel-schedule-audit",
+    "description": "Audit Laravel scheduler definitions before deployment.",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "AsfiaAiman\\LaravelScheduleAudit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AsfiaAiman\\LaravelScheduleAudit\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.5"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AsfiaAiman\\LaravelScheduleAudit\\LaravelScheduleAuditServiceProvider"
+            ]
+        }
+    }
+}
