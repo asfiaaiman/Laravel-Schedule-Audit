@@ -13,14 +13,17 @@ jobs:
       matrix:
         include:
           - php: '8.2'
-            laravel: '11.*'
-            testbench: '9.*'
-          - php: '8.2'
             laravel: '12.*'
             testbench: '10.*'
           - php: '8.4'
             laravel: '12.*'
             testbench: '10.*'
+          - php: '8.3'
+            laravel: '13.*'
+            testbench: '11.*'
+          - php: '8.4'
+            laravel: '13.*'
+            testbench: '11.*'
 
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +39,9 @@ jobs:
       - name: Resolve matrix dependencies
         run: composer update --no-interaction --prefer-dist --with-all-dependencies "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}"
 
+      - name: Audit resolved dependencies
+        run: composer audit
+
       - name: Generate optimized autoload files
         run: composer dump-autoload --optimize
 
@@ -43,7 +49,7 @@ jobs:
         run: vendor/bin/phpunit
 
   clean-install:
-    name: Clean Laravel 11 install
+    name: Clean Laravel 12 install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +60,7 @@ jobs:
           coverage: none
 
       - name: Create a fresh Laravel application
-        run: composer create-project laravel/laravel:^11.0 /tmp/schedule-audit-app --no-interaction --prefer-dist
+        run: composer create-project laravel/laravel:^12.0 /tmp/schedule-audit-app --no-interaction --prefer-dist
 
       - name: Install the package with normal Composer scripts
         working-directory: /tmp/schedule-audit-app

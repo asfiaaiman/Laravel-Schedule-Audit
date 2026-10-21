@@ -4,8 +4,8 @@ A lightweight CLI tool that audits Laravel scheduled tasks for common scheduling
 
 ## Requirements
 
-- PHP 8.2+
-- Laravel 11 or 12
+- Laravel 12 with PHP 8.2+
+- Laravel 13 with PHP 8.3+
 - A Laravel application that defines scheduled tasks
 
 ## Installation
